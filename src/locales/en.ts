@@ -115,6 +115,8 @@ export default {
     workplace: 'Workplace',
     guide: 'Guide',
     component: 'Component',
+    dependence: 'Dependence',
+    dependenceSearch: 'Search',
     icon: 'Icon',
     echart: 'Echart',
     countTo: 'Count to',

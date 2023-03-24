@@ -122,6 +122,26 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     ]
   },
   {
+    path: '/dependence',
+    component: Layout,
+    name: 'Dependence',
+    meta: {
+      title: t('router.dependence'),
+      icon: 'bx:bxs-component',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'search',
+        component: () => import('@/views/Dependence/Search.vue'),
+        name: 'DependenceSearch',
+        meta: {
+          title: t('router.dependenceSearch')
+        }
+      }
+    ]
+  },
+  {
     path: '/components',
     component: Layout,
     name: 'ComponentsDemo',

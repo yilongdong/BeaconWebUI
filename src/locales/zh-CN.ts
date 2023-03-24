@@ -115,6 +115,8 @@ export default {
     workplace: '工作台',
     guide: '引导',
     component: '组件',
+    dependence: '依赖',
+    dependenceSearch: '查询',
     icon: '图标',
     echart: '图表',
     countTo: '数字动画',
