@@ -64,6 +64,8 @@ service.interceptors.response.use(
       return response
     } else if (response.data.code === result_code) {
       return response.data
+    } else if (response.data.code === undefined) {
+      return response.data
     } else {
       ElMessage.error(response.data.message)
     }

@@ -210,6 +210,12 @@ export default {
     pushCode: 'Archer 推送 代码到 Github',
     follow: '关注'
   },
+  dependenceSearch: {
+    searchPlan: '查询计划',
+    formDes: '配置查询计划，执行过的查询计划会进行记录',
+    searchRange: '查询范围',
+    searchContent: '查询内容'
+  },
   formDemo: {
     input: '输入框',
     inputNumber: '数字输入框',
