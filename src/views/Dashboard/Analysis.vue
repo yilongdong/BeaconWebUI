@@ -7,93 +7,99 @@ import { ref, reactive } from 'vue'
 import {
   getUserAccessSourceApi,
   getWeeklyUserActivityApi,
-  getMonthlySalesApi
+  getMonthlySalesApi,
+  getTops
 } from '@/api/dashboard/analysis'
 import { set } from 'lodash-es'
 import { EChartsOption } from 'echarts'
 import { useI18n } from '@/hooks/web/useI18n'
+import { useCache } from '@/hooks/web/useCache'
+import { useAppStore } from '@/store/modules/app'
 
 const { t } = useI18n()
 
 const loading = ref(true)
 
 const pieOptionsData = reactive<EChartsOption>(pieOptions) as EChartsOption
-
+const appStore = useAppStore()
+const { wsCache } = useCache()
+const projectID: string = wsCache.get(appStore.userInfo).projectID
 // 用户来源
-const getUserAccessSource = async () => {
-  const res = await getUserAccessSourceApi().catch(() => {})
-  if (res) {
-    set(
-      pieOptionsData,
-      'legend.data',
-      res.data.map((v) => t(v.name))
-    )
-    pieOptionsData!.series![0].data = res.data.map((v) => {
-      return {
-        name: t(v.name),
-        value: v.value
-      }
-    })
-  }
+
+const topsLoading = {
+  GIT: true,
+  LOC: true
+}
+const setAndCheckAllLoad = (name: string) => {
+  topsLoading[name] = false
+  console.log(topsLoading)
+  loading.value = !(topsLoading.GIT == false && topsLoading.LOC == false)
+}
+const getTopsOfLOC = async () => {
+  const { onResult: onResult } = getTops(
+    projectID,
+    {
+      sort: 'desc',
+      take: 10
+    },
+    'LOC'
+  )
+  onResult((queryResult) => {
+    if (queryResult.loading) return
+    console.log('loc queryResult', queryResult)
+    if (queryResult?.data?.project?.tops) {
+      set(pieOptionsData, 'legend.data', queryResult?.data?.project?.tops)
+      pieOptionsData!.series![0].data = queryResult?.data?.project?.tops.map((v) => {
+        console.log(v)
+        return {
+          name: v.name,
+          value: v.value
+        }
+      })
+    }
+    setAndCheckAllLoad('LOC')
+  })
 }
 
 const barOptionsData = reactive<EChartsOption>(barOptions) as EChartsOption
 
 // 周活跃量
-const getWeeklyUserActivity = async () => {
-  const res = await getWeeklyUserActivityApi().catch(() => {})
-  if (res) {
-    set(
-      barOptionsData,
-      'xAxis.data',
-      res.data.map((v) => t(v.name))
-    )
-    set(barOptionsData, 'series', [
-      {
-        name: t('analysis.activeQuantity'),
-        data: res.data.map((v) => v.value),
-        type: 'bar'
-      }
-    ])
-  }
+const getTopsOfGit = async () => {
+  const { onResult: onResult } = getTops(
+    projectID,
+    {
+      take: 7,
+      sort: 'desc'
+    },
+    'GIT'
+  )
+  onResult((queryResult) => {
+    if (queryResult.loading) return
+    console.log('git queryResult', queryResult)
+    if (queryResult?.data?.project?.tops) {
+      set(
+        barOptionsData,
+        'xAxis.data',
+        queryResult?.data?.project?.tops?.map((v) => v.name)
+      )
+      set(barOptionsData, 'series', [
+        {
+          name: '近期变更次数',
+          data: queryResult?.data?.project?.tops?.map((v) => v.value),
+          type: 'bar'
+        }
+      ])
+    }
+    setAndCheckAllLoad('GIT')
+  })
 }
 
 const lineOptionsData = reactive<EChartsOption>(lineOptions) as EChartsOption
 
 // 每月销售总额
-const getMonthlySales = async () => {
-  const res = await getMonthlySalesApi().catch(() => {})
-  if (res) {
-    set(
-      lineOptionsData,
-      'xAxis.data',
-      res.data.map((v) => t(v.name))
-    )
-    set(lineOptionsData, 'series', [
-      {
-        name: t('analysis.estimate'),
-        smooth: true,
-        type: 'line',
-        data: res.data.map((v) => v.estimate),
-        animationDuration: 2800,
-        animationEasing: 'cubicInOut'
-      },
-      {
-        name: t('analysis.actual'),
-        smooth: true,
-        type: 'line',
-        itemStyle: {},
-        data: res.data.map((v) => v.actual),
-        animationDuration: 2800,
-        animationEasing: 'quadraticOut'
-      }
-    ])
-  }
-}
 
 const getAllApi = async () => {
-  await Promise.all([getUserAccessSource(), getWeeklyUserActivity(), getMonthlySales()])
-  loading.value = false
+  await Promise.all([getTopsOfLOC(), getTopsOfGit()])
 }
 
 getAllApi()
@@ -102,24 +108,19 @@ getAllApi()
 <template>
   <PanelGroup />
   <ElRow :gutter="20" justify="space-between">
-    <ElCol :xl="10" :lg="10" :md="24" :sm="24" :xs="24">
+    <ElCol :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
       <ElCard shadow="hover" class="mb-20px">
         <ElSkeleton :loading="loading" animated>
           <Echart :options="pieOptionsData" :height="300" />
         </ElSkeleton>
       </ElCard>
     </ElCol>
-    <ElCol :xl="14" :lg="14" :md="24" :sm="24" :xs="24">
+  </ElRow>
+  <ElRow :gutter="20" justify="space-between">
+    <ElCol :xl="24" :lg="24" :md="24" :sm="24" :xs="24">
       <ElCard shadow="hover" class="mb-20px">
         <ElSkeleton :loading="loading" animated>
-          <Echart :options="barOptionsData" :height="300" />
-        </ElSkeleton>
-      </ElCard>
-    </ElCol>
-    <ElCol :span="24">
-      <ElCard shadow="hover" class="mb-20px">
-        <ElSkeleton :loading="loading" animated :rows="4">
-          <Echart :options="lineOptionsData" :height="350" />
+          <Echart :options="barOptionsData" :height="400" />
         </ElSkeleton>
       </ElCard>
     </ElCol>

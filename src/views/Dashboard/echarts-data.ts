@@ -74,7 +74,7 @@ export const lineOptions: EChartsOption = {
 
 export const pieOptions: EChartsOption = {
   title: {
-    text: t('analysis.userAccessSource'),
+    text: '代码量',
     left: 'center'
   },
   tooltip: {
@@ -84,34 +84,22 @@ export const pieOptions: EChartsOption = {
   legend: {
     orient: 'vertical',
     left: 'left',
-    data: [
-      t('analysis.directAccess'),
-      t('analysis.mailMarketing'),
-      t('analysis.allianceAdvertising'),
-      t('analysis.videoAdvertising'),
-      t('analysis.searchEngines')
-    ]
+    data: []
   },
   series: [
     {
-      name: t('analysis.userAccessSource'),
+      name: '纯代码行数',
       type: 'pie',
       radius: '55%',
-      center: ['50%', '60%'],
-      data: [
-        { value: 335, name: t('analysis.directAccess') },
-        { value: 310, name: t('analysis.mailMarketing') },
-        { value: 234, name: t('analysis.allianceAdvertising') },
-        { value: 135, name: t('analysis.videoAdvertising') },
-        { value: 1548, name: t('analysis.searchEngines') }
-      ]
+      center: ['70%', '60%'],
+      data: []
     }
   ]
 }
 
 export const barOptions: EChartsOption = {
   title: {
-    text: t('analysis.weeklyUserActivity'),
+    text: 'Git热点',
     left: 'center'
   },
   tooltip: {
@@ -145,7 +133,7 @@ export const barOptions: EChartsOption = {
   },
   series: [
     {
-      name: t('analysis.activeQuantity'),
+      name: '近期变更次数',
       data: [13253, 34235, 26321, 12340, 24643, 1322, 1324],
       type: 'bar'
     }

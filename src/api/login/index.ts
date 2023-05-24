@@ -1,5 +1,7 @@
 import request from '@/config/axios'
 import type { UserType } from './types'
+import { useQuery } from '@vue/apollo-composable'
+import gql from 'graphql-tag'
 
 interface RoleParams {
   roleName: string
@@ -7,6 +9,32 @@ interface RoleParams {
 
 export const loginApi = (data: UserType): Promise<IResponse<UserType>> => {
   return request.post({ url: '/user/login', data })
+}
+
+export const loginGraphQLApi = (data: UserType) => {
+  const { onResult } = useQuery(
+    gql`
+      query Query($userLoginInput: UserLoginInput!) {
+        login(userLoginInput: $userLoginInput) {
+          id
+          username
+          role
+          projectID
+          projectName
+        }
+      }
+    `,
+    {
+      userLoginInput: {
+        username: data.username,
+        password: data.password,
+        project: data.project
+      }
+    }
+  )
+  return {
+    onResult
+  }
 }
 
 export const loginOutApi = (): Promise<IResponse> => {

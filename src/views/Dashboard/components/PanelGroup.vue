@@ -4,9 +4,14 @@ import { CountTo } from '@/components/CountTo'
 import { useDesign } from '@/hooks/web/useDesign'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ref, reactive } from 'vue'
-import { getCountApi } from '@/api/dashboard/analysis'
+import { getCountApi, getCountGraphQLApi } from '@/api/dashboard/analysis'
+import { useCache } from '@/hooks/web/useCache'
+import { useAppStore } from '@/store/modules/app'
 import type { AnalysisTotalTypes } from '@/api/dashboard/analysis/types'
+import { UserType } from '@/api/login/types'
 
+const appStore = useAppStore()
+const { wsCache } = useCache()
 const { t } = useI18n()
 
 const { getPrefixCls } = useDesign()
@@ -16,19 +21,19 @@ const prefixCls = getPrefixCls('panel')
 const loading = ref(true)
 
 let totalState = reactive<AnalysisTotalTypes>({
-  users: 0,
-  messages: 0,
-  moneys: 0,
-  shoppings: 0
+  classCount: 0,
+  codeCount: 0,
+  fileCount: 0,
+  userCount: 0
 })
 
 const getCount = async () => {
-  const res = await getCountApi()
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
-  totalState = Object.assign(totalState, res?.data || {})
+  const userInfo = wsCache.get(appStore.userInfo)
+  const { onResult: onResult } = getCountGraphQLApi(userInfo.projectID)
+  onResult((queryResult) => {
+    loading.value = false
+    totalState = Object.assign(totalState, queryResult?.data?.project || {})
+  })
 }
 
 getCount()
@@ -49,13 +54,13 @@ getCount()
                 </div>
               </div>
               <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.newUser')
-                }}</div>
+                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">
+                  用户数
+                </div>
                 <CountTo
                   class="text-20px font-700 text-right"
                   :start-val="0"
-                  :end-val="102400"
+                  :end-val="totalState.userCount"
                   :duration="2600"
                 />
               </div>
@@ -74,17 +79,17 @@ getCount()
                 <div
                   :class="`${prefixCls}__item--icon ${prefixCls}__item--message p-16px inline-block rounded-6px`"
                 >
-                  <Icon icon="svg-icon:message" :size="40" />
+                  <Icon icon="svg-icon:code" :size="40" />
                 </div>
               </div>
               <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.unreadInformation')
-                }}</div>
+                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">
+                  代码行数
+                </div>
                 <CountTo
                   class="text-20px font-700 text-right"
                   :start-val="0"
-                  :end-val="81212"
+                  :end-val="totalState.codeCount"
                   :duration="2600"
                 />
               </div>
@@ -103,17 +108,17 @@ getCount()
                 <div
                   :class="`${prefixCls}__item--icon ${prefixCls}__item--money p-16px inline-block rounded-6px`"
                 >
-                  <Icon icon="svg-icon:money" :size="40" />
+                  <Icon icon="svg-icon:files" :size="40" />
                 </div>
               </div>
               <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.transactionAmount')
-                }}</div>
+                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">
+                  文件数
+                </div>
                 <CountTo
                   class="text-20px font-700 text-right"
                   :start-val="0"
-                  :end-val="9280"
+                  :end-val="totalState.fileCount"
                   :duration="2600"
                 />
               </div>
@@ -132,17 +137,17 @@ getCount()
                 <div
                   :class="`${prefixCls}__item--icon ${prefixCls}__item--shopping p-16px inline-block rounded-6px`"
                 >
-                  <Icon icon="svg-icon:shopping" :size="40" />
+                  <Icon icon="svg-icon:class" :size="40" />
                 </div>
               </div>
               <div class="flex flex-col justify-between">
-                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">{{
-                  t('analysis.totalShopping')
-                }}</div>
+                <div :class="`${prefixCls}__item--text text-16px text-gray-500 text-right`">
+                  类个数
+                </div>
                 <CountTo
                   class="text-20px font-700 text-right"
                   :start-val="0"
-                  :end-val="13600"
+                  :end-val="totalState.classCount"
                   :duration="2600"
                 />
               </div>

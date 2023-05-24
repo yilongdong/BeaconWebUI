@@ -3,7 +3,6 @@ import type { RouteRecordRaw } from 'vue-router'
 import type { App } from 'vue'
 import { Layout, getParentLayout } from '@/utils/routerHelper'
 import { useI18n } from '@/hooks/web/useI18n'
-
 const { t } = useI18n()
 
 export const constantRouterMap: AppRouteRecordRaw[] = [
@@ -95,7 +94,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     name: 'ExternalLink',
     children: [
       {
-        path: 'https://element-plus-admin-doc.cn/',
+        path: 'https://github.com/yilongdong/tudumper',
         name: 'DocumentLink',
         meta: {
           title: t('router.document'),
@@ -122,21 +121,117 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
     ]
   },
   {
-    path: '/dependence',
+    path: '/class',
     component: Layout,
-    name: 'Dependence',
+    name: 'Class',
     meta: {
-      title: t('router.dependence'),
+      title: '类分析',
       icon: 'bx:bxs-component',
       alwaysShow: true
     },
     children: [
       {
-        path: 'search',
-        component: () => import('@/views/Dependence/Search.vue'),
-        name: 'DependenceSearch',
+        path: 'class-attribute',
+        component: () => import('@/views/Class/Attribute/Attribute.vue'),
+        name: 'ClassAttribute',
         meta: {
-          title: t('router.dependenceSearch')
+          title: '数值属性'
+        }
+      },
+      {
+        path: 'class-dependence',
+        component: () => import('@/views/Class/Dependence/Dependence.vue'),
+        name: 'ClassDependence',
+        meta: {
+          title: '耦合度'
+        }
+      },
+      {
+        path: 'class-uml',
+        component: () => import('@/views/Class/UML/UML.vue'),
+        name: 'ClassUML',
+        meta: {
+          title: 'UML图'
+        }
+      },
+      {
+        path: 'class-inherit',
+        component: () => import('@/views/Class/Inherit/Inherit.vue'),
+        name: 'ClassInherit',
+        meta: {
+          title: '继承关系'
+        }
+      }
+    ]
+  },
+  {
+    path: '/function',
+    component: Layout,
+    name: 'Function',
+    meta: {
+      title: '函数分析',
+      icon: 'bx:bxs-component',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'function-attribute',
+        component: () => import('@/views/Function/FunctionAttrs.vue'),
+        name: 'FunctionAttribute',
+        meta: {
+          title: '数值属性'
+        }
+      },
+      {
+        path: 'function-callgraph',
+        component: () => import('@/views/Dependence/Search.vue'),
+        name: 'CallGraph',
+        meta: {
+          title: '调用图'
+        }
+      },
+      {
+        path: 'function-dependence',
+        component: () => import('@/views/Dependence/Search.vue'),
+        name: 'FunctionDependence',
+        meta: {
+          title: '依赖查询'
+        }
+      }
+    ]
+  },
+  {
+    path: '/file',
+    component: Layout,
+    name: 'File',
+    meta: {
+      title: '文件分析',
+      icon: 'bx:bxs-component',
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: 'file-git',
+        component: () => import('@/views/File/GitHotspot/GitHotspot.vue'),
+        name: 'FileGit',
+        meta: {
+          title: 'Git热点'
+        }
+      },
+      {
+        path: 'file-LOC',
+        component: () => import('@/views/File/LineOfCode.vue'),
+        name: 'FileLOC',
+        meta: {
+          title: '代码行数'
+        }
+      },
+      {
+        path: 'file-dependence',
+        component: () => import('@/views/File/Inclusions/Inclusions.vue'),
+        name: 'FileDependence',
+        meta: {
+          title: '头文件依赖'
         }
       }
     ]

@@ -4,7 +4,7 @@ import { Form } from '@/components/Form'
 import { useI18n } from '@/hooks/web/useI18n'
 import { ElButton, ElCheckbox, ElLink } from 'element-plus'
 import { useForm } from '@/hooks/web/useForm'
-import { loginApi, getTestRoleApi, getAdminRoleApi } from '@/api/login'
+import { loginApi, getTestRoleApi, getAdminRoleApi, loginGraphQLApi } from '@/api/login'
 import { useCache } from '@/hooks/web/useCache'
 import { useAppStore } from '@/store/modules/app'
 import { usePermissionStore } from '@/store/modules/permission'
@@ -43,19 +43,19 @@ const schema = reactive<FormSchema[]>([
   {
     field: 'username',
     label: t('login.username'),
-    value: 'admin',
+    value: 'yilongdong',
     component: 'Input',
     colProps: {
       span: 24
     },
     componentProps: {
-      placeholder: t('login.usernamePlaceholder')
+      placeholder: 'yilongdong'
     }
   },
   {
     field: 'password',
     label: t('login.password'),
-    value: 'admin',
+    value: '123456',
     component: 'InputPassword',
     colProps: {
       span: 24
@@ -64,7 +64,22 @@ const schema = reactive<FormSchema[]>([
       style: {
         width: '100%'
       },
-      placeholder: t('login.passwordPlaceholder')
+      placeholder: '123456'
+    }
+  },
+  {
+    field: 'project',
+    label: '项目名',
+    value: 'CXXScanner',
+    component: 'Input',
+    colProps: {
+      span: 24
+    },
+    componentProps: {
+      style: {
+        width: '100%'
+      },
+      placeholder: 'CXXScanner'
     }
   },
   {
@@ -125,27 +140,19 @@ const signIn = async () => {
       loading.value = true
       const { getFormData } = methods
       const formData = await getFormData<UserType>()
+      console.log(formData)
 
-      try {
-        const res = await loginApi(formData)
-
-        if (res) {
-          wsCache.set(appStore.getUserInfo, res.data)
-          // 是否使用动态路由
-          if (appStore.getDynamicRouter) {
-            getRole()
-          } else {
-            await permissionStore.generateRoutes('none').catch(() => {})
-            permissionStore.getAddRouters.forEach((route) => {
-              addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
-            })
-            permissionStore.setIsAddRouters(true)
-            push({ path: redirect.value || permissionStore.addRouters[0].path })
-          }
-        }
-      } finally {
+      const { onResult: onResult } = await loginGraphQLApi(formData)
+      onResult(async (queryResult) => {
+        wsCache.set(appStore.getUserInfo, queryResult?.data?.login)
+        await permissionStore.generateRoutes('none').catch(() => {})
+        permissionStore.getAddRouters.forEach((route) => {
+          addRoute(route as RouteRecordRaw) // 动态添加可访问路由表
+        })
+        permissionStore.setIsAddRouters(true)
+        push({ path: redirect.value || permissionStore.addRouters[0].path })
         loading.value = false
-      }
+      })
     }
   })
 }

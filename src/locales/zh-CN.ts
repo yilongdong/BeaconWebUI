@@ -145,6 +145,7 @@ export default {
     user: '用户管理',
     role: '角色管理',
     document: '文档',
+    playground: 'playground',
     inputPassword: '密码输入框',
     sticky: '黏性'
   },

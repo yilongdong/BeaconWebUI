@@ -1,8 +1,13 @@
 export type AnalysisTotalTypes = {
-  users: number
-  messages: number
-  moneys: number
-  shoppings: number
+  userCount: number
+  codeCount: number
+  fileCount: number
+  classCount: number
+}
+
+export type SortInput = {
+  take: number
+  sort: 'desc' | 'asc'
 }
 
 export type UserAccessSource = {

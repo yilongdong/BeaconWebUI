@@ -28,14 +28,35 @@ import { setupRouter } from './router'
 // 权限
 import { setupPermission } from './directives'
 
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 
 import App from './App.vue'
 
 import './permission'
 
+import { ApolloClient, createHttpLink, InMemoryCache } from '@apollo/client/core'
+import { provideApolloClient } from "@vue/apollo-composable";
+
+// HTTP connection to the API
+const httpLink = createHttpLink({
+  // You should use an absolute URL here
+  uri: 'http://localhost:3000/graphql',
+})
+
+// Cache implementation
+const cache = new InMemoryCache()
+
+// Create the apollo client
+const apolloClient = new ApolloClient({
+  link: httpLink,
+  cache,
+})
+
+provideApolloClient(apolloClient);
+
 // 创建实例
 const setupAll = async () => {
+
   const app = createApp(App)
 
   await setupI18n(app)
