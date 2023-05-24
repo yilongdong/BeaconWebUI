@@ -86,7 +86,7 @@ export default {
   },
   login: {
     welcome: '欢迎使用本系统',
-    message: '开箱即用的中后台管理系统',
+    message: 'C++项目分析模型可视化',
     username: '用户名',
     password: '密码',
     register: '注册',
