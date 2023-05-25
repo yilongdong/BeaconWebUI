@@ -184,7 +184,7 @@ export const asyncRouterMap: AppRouteRecordRaw[] = [
       },
       {
         path: 'function-callgraph',
-        component: () => import('@/views/Dependence/Search.vue'),
+        component: () => import('@/views/Function/CallGraph.vue'),
         name: 'CallGraph',
         meta: {
           title: '调用图'
